@@ -52,8 +52,12 @@ function App() {
 					<Route path="/about" element={<About />} />
 
 					<Route path="/academy" element={<Academy />} />
-					<Route
+					{/* <Route
 						path="/academy/individual-programs"
+						element={<IndividualProgram />}
+					/> */}
+                    <Route
+						path="/academy/:academyId"
 						element={<IndividualProgram />}
 					/>
 					<Route path="/tennis-academy" element={<TennisAcademy />} />

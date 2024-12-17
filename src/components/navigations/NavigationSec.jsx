@@ -1,4 +1,4 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -8,10 +8,12 @@ import { NavLink, useLocation } from "react-router-dom";
 import "./nav.scss";
 import yelloLogo from "../../assets/logo/white-logo.png";
 import sidebtn from "../../assets/button-side.png";
+import axios from "axios";
 // import TopBanner from "../topBanner/TopBanner";
 
 const NavigationSec = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const [academies, setAcademies] = useState([]);
   const location = useLocation();
 
   const handleClose = () => setShowOffcanvas(false);
@@ -21,6 +23,24 @@ const NavigationSec = () => {
     // Close offcanvas when the route changes
     handleClose();
   }, [location]);
+
+  useEffect(() => {
+    // Fetch academies from API
+    const fetchAcademies = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/academy");
+        if (response.data.academy && response.data.academy) {
+          setAcademies(response.data.academy);
+        }
+
+        console.log("academic response", response.data.academy);
+      } catch (error) {
+        console.error("Error fetching academies:", error);
+      }
+    };
+
+    fetchAcademies();
+  }, []);
 
   return (
     <>
@@ -67,11 +87,12 @@ const NavigationSec = () => {
                 >
                   About
                 </NavLink>
+
                 <NavDropdown
                   title="Academy"
                   id={`offcanvasNavbarDropdown-expand-md`}
                 >
-                  <NavLink
+                  {/* <NavLink
                     activeclassname="active"
                     to="/academy/individual-programs"
                     onClick={handleClose}
@@ -86,7 +107,20 @@ const NavigationSec = () => {
                     onClick={handleClose}
                   >
                     Squad Sports
-                  </NavLink>
+                  </NavLink> */}
+
+                  {academies.map((academy, index) => (
+                    <div key={academy._id}>
+                      <NavLink
+                        activeclassname="active"
+                        to={`/academy/${academy._id}`}
+                        onClick={handleClose}
+                      >
+                        {academy.title}
+                      </NavLink>
+                      {index < academies.length - 1 && <NavDropdown.Divider />}
+                    </div>
+                  ))}
                 </NavDropdown>
 
                 <NavLink
@@ -97,8 +131,6 @@ const NavigationSec = () => {
                   Special Camps
                 </NavLink>
 
-
-
                 <NavLink
                   activeclassname="active"
                   to="/e-sports"
@@ -107,7 +139,6 @@ const NavigationSec = () => {
                   E-Sports
                 </NavLink>
 
-
                 <NavLink
                   activeclassname="active"
                   to="/"
@@ -115,7 +146,6 @@ const NavigationSec = () => {
                 >
                   <img src={yelloLogo} alt="logo" />
                 </NavLink>
-
 
                 <NavDropdown
                   title="Events"
@@ -130,7 +160,6 @@ const NavigationSec = () => {
                   </NavLink>
                 </NavDropdown>
 
-
                 <NavLink
                   activeclassname="active"
                   to="/gallery"
@@ -138,7 +167,6 @@ const NavigationSec = () => {
                 >
                   Gallery
                 </NavLink>
-
 
                 <NavLink
                   activeclassname="active"
@@ -148,7 +176,6 @@ const NavigationSec = () => {
                   Contact
                 </NavLink>
 
-
                 <NavLink
                   to="/register-thunderbolts-cup"
                   onClick={handleClose}
@@ -156,7 +183,6 @@ const NavigationSec = () => {
                 >
                   REGISTER FOR TBC <img src={sidebtn} alt="tdc" />
                 </NavLink>
-                
               </Nav>
             </Offcanvas.Body>
           </Navbar.Offcanvas>
