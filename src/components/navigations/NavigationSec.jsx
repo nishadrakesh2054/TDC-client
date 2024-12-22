@@ -92,23 +92,6 @@ const NavigationSec = () => {
                   title="Academy"
                   id={`offcanvasNavbarDropdown-expand-md`}
                 >
-                  {/* <NavLink
-                    activeclassname="active"
-                    to="/academy/individual-programs"
-                    onClick={handleClose}
-                  >
-                    Individual Sports
-                  </NavLink>
-                  <NavDropdown.Divider />
-
-                  <NavLink
-                    activeClassName="active"
-                    to="/academy/squad-programs"
-                    onClick={handleClose}
-                  >
-                    Squad Sports
-                  </NavLink> */}
-
                   {academies.map((academy, index) => (
                     <div key={academy._id}>
                       <NavLink

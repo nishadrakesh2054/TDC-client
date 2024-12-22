@@ -9,7 +9,6 @@ const IndividualProgram = () => {
     <>
       <div className="individual-program">
         <Container>
-          <h1>INDIVIDUAL PROGRAMS</h1>
           <IndividualPrograms />
         </Container>
         <GetInTouch />

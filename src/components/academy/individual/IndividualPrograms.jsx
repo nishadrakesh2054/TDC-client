@@ -1,92 +1,91 @@
-import React from "react";
-import "./ind.scss";
+import React, { useState, useEffect } from "react";
 import { Row, Col, Card } from "react-bootstrap";
-import tennis from "../../../assets/academy/tennis.jpg";
-import summ from "../../../assets/academy/summing.jpg";
-
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
-import  axios from "axios";	
-
-const items = [
-  {
-    id: 1,
-    title: "TENNIS ACADEMY ",
-    image: tennis,
-    link: "/tennis-academy",
-  },
-  {
-    id: 2,
-    title: "THUNDERBOLTS Aquatic",
-    image: summ,
-    link: "/swimming-academy",
-  },
-];
+import { Link, useParams ,useNavigate } from "react-router-dom";
+import axios from "axios";
+import "./ind.scss";
 
 const IndividualPrograms = () => {
   const { academyId } = useParams();
   const [programs, setPrograms] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate=useNavigate()
   useEffect(() => {
-    // Fetch programs based on academyId
     const fetchPrograms = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:3000/api/program?academyId=${academyId}`
+        setLoading(true);
+        const response = await axios.get("http://localhost:3000/api/program");
+        const filteredPrograms = response.data.program.filter(
+          (program) => program.academyId === academyId
         );
-        setPrograms(response.data.program);
-
-        console.log("program data", response.data.program);
+        setPrograms(filteredPrograms);
+        setLoading(false);
       } catch (error) {
+        setError("Error fetching programs.");
+        setLoading(false);
         console.error("Error fetching programs:", error);
       }
     };
 
     fetchPrograms();
   }, [academyId]);
+
+  if (loading) {
+    return <p>Loading programs...</p>;
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+ 
+
+  const BASE_URL = `http://localhost:3000/uploads`;
+
+  const handleCardClick = async (programId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/agegroup/program/${programId}`
+      );
+      // Navigate to the age group details page or display the data
+      console.log("Age group data:", response.data.ageGroups);
+      navigate(`/agegroup/${programId}`, {
+        state: { ageGroupData: response.data.ageGroups },
+      });
+    } catch (error) {
+      console.error("Error fetching age group data:", error);
+    }
+  };
+
   return (
-    <>
-      {/* <div className="indi-pri-card">
+    <div className="individual-programs">
+      <h1>Programs available</h1>
+      {programs.length === 0 ? (
+        <p>No programs available for this academy.</p>
+      ) : (
         <Row xs={1} md={2} className="g-4">
-          {items.map((_, idx) => (
-            <Col key={idx}>
-              <Link to={_?.link}>
-                <Card className="border-0 ind-cards rounded-0">
-                  <div className="imga-car-ind">
-                    <Card.Img
-                      variant="top"
-                      src={_?.image}
-                      alt="tennis"
-                      className="rounded-0"
-                    />
-                  </div>
-                  <Card.Body className="card-ind-body">
-                    <h3>{_?.title}</h3>
-                  </Card.Body>
-                </Card>
-              </Link>
+          {programs.map((program) => (
+            <Col key={program._id}>
+              <Card
+                className="border-0 rounded-0"
+                onClick={() => handleCardClick(program._id)}
+              >
+                <div className="card-img-container">
+                  <Card.Img
+                    variant="top"
+                    src={`${BASE_URL}/${program.imageKey}`}
+                    alt="Program Image"
+                    className="img-fluid rounded-0 card-img"
+                  />
+                </div>
+                <Card.Body className="card-ind-body">
+                  <h3>{program.name}</h3>
+                </Card.Body>
+              </Card>
             </Col>
           ))}
         </Row>
-      </div> */}
-      <div>
-        <h1>Programs for Academy {academyId}</h1>
-        {programs.length === 0 ? (
-          <p>No programs available for this academy.</p>
-        ) : (
-          <ul>
-            {programs.map((program) => (
-              <li key={program._id}>
-                <h2>{program.name}</h2>
-                <p>{program.description}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
